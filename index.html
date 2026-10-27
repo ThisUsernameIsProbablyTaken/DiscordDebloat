@@ -1,222 +1,204 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Support Centre</title>
-
-<style>
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f7f7f9;
-    color: #232428;
-  }
-
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 7%;
-    background: #fff;
-    border-bottom: 1px solid #e4e5e9;
-  }
-
-  .brand {
-    font-size: 21px;
-    font-weight: 800;
-    color: #5865f2;
-  }
-
-  .nav-link {
-    color: #454750;
-    text-decoration: none;
-    font-size: 14px;
-  }
-
-  .hero {
-    background: #5865f2;
-    color: white;
-    text-align: center;
-    padding: 65px 20px 75px;
-  }
-
-  .hero h1 {
-    font-size: clamp(30px, 5vw, 44px);
-    margin: 0 0 12px;
-  }
-
-  .hero p {
-    color: #e7e9ff;
-    margin-bottom: 28px;
-  }
-
-  .search {
-    display: block;
-    width: min(600px, 100%);
-    margin: auto;
-    padding: 16px 18px;
-    border: none;
-    border-radius: 9px;
-    font-size: 15px;
-    outline-color: #232428;
-  }
-
-  .container {
-    max-width: 1050px;
-    margin: 45px auto;
-    padding: 0 22px;
-  }
-
-  .section-title {
-    margin-bottom: 20px;
-    font-size: 23px;
-  }
-
-  .categories {
-    display: grid;
-    grid-template-columns:
-      repeat(auto-fit, minmax(230px, 1fr));
-    gap: 18px;
-  }
-
-  .category {
-    background: white;
-    border: 1px solid #e5e5eb;
-    border-radius: 12px;
-    padding: 24px;
-    text-decoration: none;
-    color: inherit;
-    transition: transform .15s, box-shadow .15s;
-  }
-
-  .category:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px #23242812;
-  }
-
-  .category h3 {
-    margin: 0 0 10px;
-    font-size: 18px;
-  }
-
-  .category p {
-    margin: 0;
-    line-height: 1.6;
-    color: #656775;
-    font-size: 14px;
-  }
-
-  .notice {
-    margin-top: 35px;
-    padding: 22px;
-    background: white;
-    border: 1px solid #e5e5eb;
-    border-radius: 12px;
-  }
-
-  .notice a {
-    color: #5865f2;
-  }
-
-  footer {
-    text-align: center;
-    padding: 25px;
-    color: #777986;
-    font-size: 13px;
-    border-top: 1px solid #e5e5eb;
-    background: white;
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Latency Debloat Documentation</title>
+  <meta name="description" content="Independent documentation explaining latency, debloat scripts, safe testing, and rollback steps.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #232428;
+      --muted: #62646b;
+      --line: #e3e4e8;
+      --panel: #f5f6f8;
+      --accent: #5865f2;
+      --warning: #fff5d8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #fff;
+      color: var(--ink);
+      font: 16px/1.65 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    a { color: var(--accent); }
+    .topbar {
+      min-height: 72px; padding: 16px max(24px, calc((100% - 1120px) / 2));
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      border-bottom: 1px solid var(--line); background: #fff;
+    }
+    .brand { font-weight: 750; letter-spacing: -.03em; font-size: 1.12rem; }
+    .brand span { color: var(--accent); }
+    .nav { display: flex; flex-wrap: wrap; gap: 18px; color: var(--muted); font-size: .94rem; }
+    .nav a { color: inherit; text-decoration: none; }
+    .nav a:hover { color: var(--accent); }
+    .page { max-width: 1120px; margin: 0 auto; padding: 34px 24px 70px; }
+    .crumbs { color: var(--muted); font-size: .9rem; margin-bottom: 26px; }
+    .layout { display: grid; grid-template-columns: 245px minmax(0, 1fr); gap: 46px; align-items: start; }
+    aside { border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+    aside h2 { margin: 0 0 12px; font-size: 1rem; }
+    aside a { display: block; padding: 7px 0; text-decoration: none; font-size: .92rem; }
+    .eyebrow { color: var(--accent); text-transform: uppercase; font-size: .76rem; letter-spacing: .1em; font-weight: 750; }
+    h1 { font-size: clamp(2rem, 4vw, 2.7rem); line-height: 1.15; letter-spacing: -.04em; margin: 8px 0 14px; }
+    h2 { margin-top: 34px; font-size: 1.5rem; letter-spacing: -.025em; }
+    h3 { margin-top: 24px; font-size: 1.1rem; }
+    .intro { color: var(--muted); font-size: 1.08rem; max-width: 760px; }
+    .meta { color: var(--muted); font-size: .88rem; border-bottom: 1px solid var(--line); padding-bottom: 22px; margin-bottom: 24px; }
+    .callout { background: var(--panel); border-left: 4px solid var(--accent); padding: 16px 18px; border-radius: 5px; margin: 22px 0; }
+    .warning { background: var(--warning); border-left-color: #b58100; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 28px; }
+    button {
+      appearance: none; border: 0; border-radius: 6px; padding: 11px 16px;
+      background: var(--accent); color: #fff; font: inherit; font-weight: 650;
+      cursor: pointer;
+    }
+    button.secondary { background: #e9eaff; color: #343b9b; }
+    button:focus-visible { outline: 3px solid #9ca3ff; outline-offset: 3px; }
+    .toc { background: var(--panel); border-radius: 8px; padding: 18px 22px; }
+    .toc strong { display: block; margin-bottom: 8px; }
+    .toc ul { margin: 0; padding-left: 22px; }
+    li { margin: 5px 0; }
+    code { background: #f0f1f4; padding: 2px 5px; border-radius: 4px; }
+    .footer { border-top: 1px solid var(--line); margin-top: 46px; padding-top: 22px; color: var(--muted); font-size: .9rem; }
+    .status { min-height: 1.5em; color: var(--muted); font-size: .9rem; }
+    @media (max-width: 760px) {
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .layout { grid-template-columns: 1fr; gap: 24px; }
+      aside { order: 2; }
+      .page { padding: 24px 18px 50px; }
+    }
+  </style>
 </head>
-
 <body>
+  <header class="topbar">
+    <div class="brand">Network Notes <span>/ Documentation</span></div>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="#overview">Overview</a>
+      <a href="#safe-use">Safety</a>
+      <a href="#testing">Testing</a>
+    </nav>
+  </header>
 
-<nav class="navbar">
-  <div class="brand">Discord</div>
-  <a class="nav-link" href="index.html">Home</a>
-</nav>
+  <main class="page">
+    <div class="crumbs">Documentation / Network performance / Latency debloat</div>
+    <div class="layout">
+      <aside aria-label="Article contents">
+        <h2>In this article</h2>
+        <a href="#overview">Overview</a>
+        <a href="#latency">Latency basics</a>
+        <a href="#what-it-changes">What a debloat file may change</a>
+        <a href="#before-you-run">Before running a file</a>
+        <a href="#testing">Testing results</a>
+        <a href="#rollback">Reversing changes</a>
+        <a href="#faq">Frequently asked questions</a>
+        <div class="button-row">
+          <button class="secondary" type="button" data-note="This demo button has no external destination.">Open quick guide</button>
+        </div>
+        <p class="status" aria-live="polite"></p>
+      </aside>
 
-<header class="hero">
-  <h1>How can we help?</h1>
-  <p>Find answers, guides and help for common issues.</p>
+      <article>
+        <div class="eyebrow">Independent technical documentation</div>
+        <h1 id="overview">Latency Debloat: Documentation and Safety Guide</h1>
+        <p class="intro">An overview of Windows “debloat” files that claim to improve latency, how to evaluate their changes, and how to test network performance without assuming that every tweak helps.</p>
+        <div class="meta">Documentation • Network performance • Read time: 5 minutes</div>
 
-  <input
-    class="search"
-    id="search"
-    type="search"
-    placeholder="Search the help centre..."
-    aria-label="Search support articles"
-  >
-</header>
+        <div class="callout warning">
+          <strong>Important:</strong> This is general educational documentation, not an endorsement of a particular download. A script cannot guarantee lower ping. Review its contents before running it, and avoid executing unknown scripts with administrator privileges.
+        </div>
 
-<main class="container">
-  <h2 class="section-title">Browse categories</h2>
+        <div class="button-row">
+          <button type="button" data-note="No download is connected to this demonstration page.">View file information</button>
+          <button class="secondary" type="button" data-note="No external links or redirects are configured on these demo buttons.">Check compatibility</button>
+        </div>
+        <p class="status" aria-live="polite"></p>
 
-  <div class="categories" id="categories">
+        <div class="toc">
+          <strong>What this article covers</strong>
+          <ul>
+            <li><a href="#latency">What latency means</a></li>
+            <li><a href="#what-it-changes">Common types of system tweaks</a></li>
+            <li><a href="#before-you-run">Safety checks before running a script</a></li>
+            <li><a href="#testing">How to measure results fairly</a></li>
+            <li><a href="#rollback">How to prepare for rollback</a></li>
+          </ul>
+        </div>
 
-    <a class="category" href="#account">
-      <h3>Account & Security</h3>
-      <p>Account settings, privacy and account protection.</p>
-    </a>
+        <h2 id="latency">1. Understanding latency</h2>
+        <p>Latency is the time it takes data to travel between your device and a destination. It is commonly measured in milliseconds (ms). In online games, the displayed ping is usually a round-trip measurement between your device and the game server.</p>
+        <ul>
+          <li><strong>Latency:</strong> how long data takes to travel.</li>
+          <li><strong>Bandwidth:</strong> how much data a connection can transfer over time.</li>
+          <li><strong>Jitter:</strong> how much latency varies from one measurement to the next.</li>
+          <li><strong>Packet loss:</strong> data packets that fail to reach their destination.</li>
+        </ul>
+        <p>A local Windows tweak cannot remove the physical distance to a game server or fix congestion at an internet provider. Wi-Fi interference, background downloads, router load, and the server's location can all affect results.</p>
 
-    <a class="category" href="#connection">
-      <h3>Connection Issues</h3>
-      <p>Help with loading, connectivity and connection errors.</p>
-    </a>
+        <h2 id="what-it-changes">2. What a “latency debloat” file may change</h2>
+        <p>“Debloat” is an informal label, not a standard technical specification. A file using this name might change Windows settings, disable background tasks, alter power options, modify network configuration, or remove preinstalled applications. Different files can make completely different changes despite using the same label.</p>
+        <p>Changes to background activity may help in some circumstances, especially if a process is consuming significant resources. Other registry or network tweaks may have no measurable benefit, reduce compatibility, or make the system less stable. Claims of a guaranteed ping reduction should be treated sceptically.</p>
 
-    <a class="category" href="#app">
-      <h3>App Troubleshooting</h3>
-      <p>Installation problems, crashes and update issues.</p>
-    </a>
+        <h2 id="before-you-run">3. Before running a file</h2>
+        <ol>
+          <li>Obtain the file from a source you trust and verify who published it.</li>
+          <li>Read the script or inspect the archive before executing it. Look for commands that change the registry, disable services, alter firewall rules, or download and run additional files.</li>
+          <li>Check whether it requires administrator access. Elevated privileges give a script broad control over the system.</li>
+          <li>Create a restore point or another suitable backup, and make sure you know how to undo each change.</li>
+          <li>Scan the file with current security software. A clean scan is useful but does not prove a file is safe.</li>
+        </ol>
+        <div class="callout">
+          <strong>Good practice:</strong> Prefer individual, documented changes over a large script that changes dozens of settings at once. That makes problems easier to identify and reverse.
+        </div>
 
-    <a class="category" href="#community">
-      <h3>Community & Servers</h3>
-      <p>Roles, permissions, moderation and server settings.</p>
-    </a>
+        <h2 id="testing">4. Measuring performance fairly</h2>
+        <p>Record a baseline before changing anything. Test the same game or server, use the same connection type, and compare several measurements rather than relying on a single unusually good result.</p>
+        <ul>
+          <li>Record average ping, variation/jitter, and packet loss where available.</li>
+          <li>Test at similar times of day and pause large downloads for both tests.</li>
+          <li>Repeat the test more than once and compare typical results.</li>
+          <li>Keep notes of every change so you can connect any result to a specific setting.</li>
+        </ul>
+        <p>If results are within normal variation, there may be no meaningful improvement. A faster speed-test download result does not necessarily mean lower in-game latency.</p>
 
-    <a class="category" href="#billing">
-      <h3>Billing & Purchases</h3>
-      <p>Payment questions, receipts and purchase support.</p>
-    </a>
+        <h2 id="rollback">5. Reversing changes</h2>
+        <p>Before making changes, save the original values or use a restore point. If problems begin after a tweak, reverse the specific changes using the instructions supplied by the script's author. If you cannot determine what a script changed, do not keep applying additional “fixes” at random.</p>
+        <p>Be particularly cautious with scripts that disable security services, change firewall behaviour, remove system components, or prevent Windows Update from working. These changes can create problems unrelated to gaming performance.</p>
 
-    <a class="category" href="#other">
-      <h3>Other Questions</h3>
-      <p>Browse general guides and frequently asked questions.</p>
-    </a>
+        <h2 id="faq">6. Frequently asked questions</h2>
+        <h3>Will a debloat file lower my ping?</h3>
+        <p>Not necessarily. It may reduce local resource contention in some cases, but ping is often determined by routing, distance, network congestion, Wi-Fi conditions, and the game server.</p>
+        <h3>Does “debloat” mean the file is safe?</h3>
+        <p>No. The label says nothing about the publisher, contents, or security of the file. Inspect it before running it.</p>
+        <h3>Should I disable every background service?</h3>
+        <p>No. Some services support networking, updates, audio, security, or hardware. Disabling services indiscriminately can cause instability or remove important functionality.</p>
+        <h3>What is the safest first step for high ping?</h3>
+        <p>Test with a wired connection if possible, pause downloads, restart networking equipment when appropriate, and compare different servers. These checks help identify whether the issue is local, wireless, or route-related before changing Windows settings.</p>
 
-  </div>
+        <div class="callout">
+          <strong>Summary:</strong> Treat latency debloat files as collections of specific system changes, not magic performance upgrades. Verify the source, inspect the changes, measure before and after, and keep a rollback plan.
+        </div>
 
-  <section class="notice">
-    <h3>Still need help?</h3>
-    <p>Visit our support resources or contact our team.</p>
-    <a href="contact.html">Contact support →</a>
-  </section>
-</main>
+        <div class="button-row">
+          <button type="button" data-note="This demo action does not download or execute any file.">Download documentation</button>
+          <button class="secondary" type="button" data-note="No support redirect is configured on this demonstration page.">Contact support</button>
+        </div>
+        <p class="status" aria-live="polite"></p>
 
-<footer>
-  © 2026 Discord · Support Centre
-</footer>
-
-<script>
-  const search = document.getElementById("search");
-  const categories = document.querySelectorAll(".category");
-
-  search.addEventListener("input", () => {
-    const query = search.value.toLowerCase().trim();
-
-    categories.forEach(category => {
-      category.hidden = !category.textContent
-        .toLowerCase()
-        .includes(query);
+        <div class="footer">
+          This is an independent documentation template and is not affiliated with Discord or any game publisher. Buttons on this demo page intentionally do not navigate, redirect, download, or execute files.
+        </div>
+      </article>
+    </div>
+  </main>
+  <script>
+    // Demonstration-only buttons: show a local notice and never navigate or redirect.
+    document.querySelectorAll('button[data-note]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const status = button.closest('aside, article')?.querySelector('.status');
+        if (status) status.textContent = button.dataset.note;
+      });
     });
-  });
-</script>
-
+  </script>
 </body>
 </html>
